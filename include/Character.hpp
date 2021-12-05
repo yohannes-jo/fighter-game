@@ -10,8 +10,7 @@ class Character : public Entity
 {
 public:
 	Character(SDL_Texture *p_tex, SDL_Rect p_srect);
-	Character(SDL_Texture *p_tex, SDL_Rect p_srect, SDL_Rect p_drect);
-
+	
 	// Update the character's position according to the boolean flags
 	void update();
 

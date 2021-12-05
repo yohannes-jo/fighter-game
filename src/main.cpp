@@ -35,12 +35,17 @@ int main(int argc, char const *argv[])
 			SDL_Event e;
 
 			// Load entities
-			Entity sky {main.loadTexture("./res/gfx/background_blue_sky.png"), {0, 0, 800, 560}, {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}};
+			Entity sky_1 {main.loadTexture("./res/gfx/background_blue_sky.png"), {0, 0, 800, 560}};
+			Entity sky_2 {main.loadTexture("./res/gfx/background_blue_sky.png"), {0, 0, 800, 560}};
 			Entity grass {main.loadTexture("./res/gfx/ground_grass_1.png"), {0, 0, 32, 32}};
 			Character player {main.loadTexture("./res/gfx/hulking_knight.png"), {0, 0, 64, 64}};
 
-			// Render the player at the starting position
+			// Initialize the player's destination rect
 			main.render(&player, {0, 360, 128, 128});
+
+			// Initialize the skies' destination rect
+			main.render(&sky_1, {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
+			main.render(&sky_2, {800, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
 
 			// Main game loop
 			while (!quit)
@@ -69,11 +74,28 @@ int main(int argc, char const *argv[])
 
 				}
 
+				// Clear viewport for the next rendering
+				SDL_RenderClear(main.getRenderer());
+
 				// Update the window and show the next frame
 				player.update();
 
-				// Render the sky
-				main.render(&sky, {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
+				// Update the sky position and add/remove as necessary
+				if (sky_1.getDRect().x < -800)
+					sky_1.setDRect({790, 0, 800, 600});
+				else
+				{
+					sky_1.setDRect({sky_1.getDRect().x - 1, sky_1.getDRect().y, sky_1.getDRect().w, sky_1.getDRect().h});
+					main.render(&sky_1, sky_1.getDRect());
+				}
+
+				if (sky_2.getDRect().x < -800)
+					sky_2.setDRect({790, 0, 800, 600});
+				else
+				{
+					sky_2.setDRect({sky_2.getDRect().x - 1, sky_2.getDRect().y, sky_2.getDRect().w, sky_2.getDRect().h});
+					main.render(&sky_2, sky_2.getDRect());
+				}
 
 				// Render the ground
 				for (int i = 0; i < 6; i++)

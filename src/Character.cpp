@@ -1,20 +1,5 @@
 #include "Character.hpp"
 
-Character::Character(SDL_Texture *p_tex, SDL_Rect p_srect, SDL_Rect p_drect)
-	: Entity(p_tex, p_srect, p_drect)
-{
-	moving_left = false;
-	moving_right = false;
-	crouching = false;
-	jumping = false;
-
-	moving = false;
-
-	frame = 0;
-	jumping_velocity = 50;
-	gravity = 5;	
-}
-
 Character::Character(SDL_Texture *p_tex, SDL_Rect p_srect)
 	: Entity(p_tex, p_srect)
 {
@@ -48,7 +33,7 @@ void Character::update()
 			frame = 0;
 		}
 
-		if (drect.x >= 0 && frame % 5 == 0) drect.x -= 1;
+		if (drect.x >= 0 && frame % 3 == 0) drect.x -= 1;
 	}
 	else if (moving_right)
 	{
@@ -66,7 +51,7 @@ void Character::update()
 			frame = 0;
 		}
 
-		if (drect.x <= 672 && frame % 5 == 0) drect.x += 1;
+		if (drect.x <= 672 && frame % 3 == 0) drect.x += 1;
 	}
 	
 	if (jumping || drect.y < 360)
@@ -93,6 +78,13 @@ void Character::update()
 		moving = false;
 	}
 
+	// reset the velocity everytime the sprite touches the ground
+	if (drect.y == 360)
+	{
+		jumping_velocity = 50;
+	}
+
+	// reset sprite when it stops moving
 	if (!moving)
 	{
 		srect.x = 0;
@@ -104,9 +96,6 @@ void Character::update()
 		jumping_velocity = 50;
 		drect.y = 360;
 	}
-
-	printf("(%d, %d, %d, %d)\n", drect.x, drect.y, drect.w, drect.h);
-	printf("%d", jumping_velocity);
 }
 
 void Character::set_moving_left(bool p_flag) { moving_left = p_flag; }

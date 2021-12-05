@@ -3,3 +3,6 @@ bin/
 
 # obj source
 *.o
+
+# vs code workspace properties
+.vscode/
