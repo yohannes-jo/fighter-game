@@ -30,7 +30,11 @@ int main(int argc, char const *argv[])
 		}
 		else
 		{
+			// Main game loop flag
 			bool quit = false;
+
+			// Number of frames rendered since the start of the main game loop
+			int window_frame = 0;
 
 			SDL_Event e;
 
@@ -58,20 +62,18 @@ int main(int argc, char const *argv[])
 					}
 					else if (e.type == SDL_KEYDOWN)
 					{
-						if (e.key.keysym.sym == SDLK_UP) player.set_jumping(true);
+						if (e.key.keysym.sym == SDLK_UP || e.key.keysym.sym == SDLK_SPACE) player.set_jumping(true);
 						if (e.key.keysym.sym == SDLK_DOWN) player.set_crouching(true);
 						if (e.key.keysym.sym == SDLK_LEFT) player.set_moving_left(true);
 						if (e.key.keysym.sym == SDLK_RIGHT) player.set_moving_right(true);
 					}
-
 					else if (e.type == SDL_KEYUP)
 					{
-						if (e.key.keysym.sym == SDLK_UP) player.set_jumping(false);
+						if (e.key.keysym.sym == SDLK_UP || e.key.keysym.sym == SDLK_SPACE) player.set_jumping(false);
 						if (e.key.keysym.sym == SDLK_DOWN) player.set_crouching(false);
 						if (e.key.keysym.sym == SDLK_LEFT) player.set_moving_left(false);
 						if (e.key.keysym.sym == SDLK_RIGHT) player.set_moving_right(false);
 					}
-
 				}
 
 				// Clear viewport for the next rendering
@@ -80,22 +82,24 @@ int main(int argc, char const *argv[])
 				// Update the window and show the next frame
 				player.update();
 
-				// Update the sky position and add/remove as necessary
-				if (sky_1.getDRect().x < -800)
-					sky_1.setDRect({790, 0, 800, 600});
-				else
+				// Update the sky position
+				if (++window_frame % 30 == 0)
 				{
+					if (sky_1.getDRect().x < -800)
+						sky_1.setDRect({799, 0, 800, 600});
+					
 					sky_1.setDRect({sky_1.getDRect().x - 1, sky_1.getDRect().y, sky_1.getDRect().w, sky_1.getDRect().h});
-					main.render(&sky_1, sky_1.getDRect());
+
+					if (sky_2.getDRect().x < -800)
+						sky_2.setDRect({799, 0, 800, 600});
+
+					sky_2.setDRect({sky_2.getDRect().x - 1, sky_2.getDRect().y, sky_2.getDRect().w, sky_2.getDRect().h});
+
+					window_frame = 0;
 				}
 
-				if (sky_2.getDRect().x < -800)
-					sky_2.setDRect({790, 0, 800, 600});
-				else
-				{
-					sky_2.setDRect({sky_2.getDRect().x - 1, sky_2.getDRect().y, sky_2.getDRect().w, sky_2.getDRect().h});
-					main.render(&sky_2, sky_2.getDRect());
-				}
+				main.render(&sky_1, sky_1.getDRect());
+				main.render(&sky_2, sky_2.getDRect());
 
 				// Render the ground
 				for (int i = 0; i < 6; i++)
@@ -107,6 +111,7 @@ int main(int argc, char const *argv[])
 			}
 
 			// Close all subsystems and terminate the program
+			SDL_DestroyRenderer(main.getRenderer());
 			main.close();
 			SDL_Quit();
 		}
